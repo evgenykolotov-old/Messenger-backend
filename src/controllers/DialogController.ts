@@ -1,5 +1,6 @@
 import express from 'express';
 import Dialog from '../models/Dialog';
+import Message from '../models/Message';
 
 class DialogController {
   static async find(req: express.Request, res: express.Response) {
@@ -14,9 +15,12 @@ class DialogController {
 
   static async create(req: express.Request, res: express.Response) {
     try {
-      const { author, partner } = req.body;
+      const { author, partner, text } = req.body;
       const dialog = new Dialog({ author, partner });
+      const message = new Message({ text, dialog: dialog._id, user: author });
+      dialog.lastMessage = message._id;
       const result = await dialog.save();
+      await message.save();
       res.json(result);
     } catch (error) {
       console.log(error);

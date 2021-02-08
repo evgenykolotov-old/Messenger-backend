@@ -23,6 +23,20 @@ class MessageController {
       console.log(error);
     }
   }
+
+  static async delete(req: express.Request, res: express.Response) {
+    try {
+      const id: string = req.params.id;
+      const dialog = await Message.findByIdAndDelete(id);
+      if (dialog) {
+        res.json({ message: 'Message Deleted' });
+      } else {
+        res.json({ message: 'Message Not Fround' });
+      }
+    } catch (error) {
+      console.log(error);
+    }
+  }
 }
 
 export default MessageController;
