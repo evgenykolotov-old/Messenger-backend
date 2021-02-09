@@ -10,6 +10,9 @@ import MessageController from './controllers/MessageController';
 import updateLastSeen from './middlewares/updateLastSeen';
 import checkAuth from './middlewares/checkAuth';
 
+import loginValidation from './utils/validations/login';
+import registerValidation from './utils/validations/register';
+
 const app = express();
 dotenv.config();
 
@@ -26,8 +29,8 @@ mongoose.connect('mongodb://localhost:27017/chat', {
 
 app.get('/user/:id', UserController.find);
 app.delete('/user/:id', UserController.delete);
-app.post('/user/register', UserController.create);
-app.post('/user/login', UserController.login);
+app.post('/user/register', registerValidation, UserController.create);
+app.post('/user/login', loginValidation, UserController.login);
 
 app.get('/dialogs', DialogController.find);
 app.delete('/dialogs/:id', DialogController.delete);
