@@ -2,23 +2,31 @@ import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import bodyParser from 'body-parser';
+import socket from 'socket.io';
+import cors from 'cors';
 
-import UserController from './controllers/UserController';
-import DialogController from './controllers/DialogController';
-import MessageController from './controllers/MessageController';
+const app = express();
+const http = require('http').Server(app);
+export const io = require('socket.io')(http);
+dotenv.config();
+
+import authRoutes from './routes/auth';
+import userRoutes from './routes/user';
+import dialogsRoutes from './routes/dialogs';
+import messagesRoutes from './routes/messages';
 
 import updateLastSeen from './middlewares/updateLastSeen';
 import checkAuth from './middlewares/checkAuth';
 
-import loginValidation from './utils/validations/login';
-import registerValidation from './utils/validations/register';
-
-const app = express();
-dotenv.config();
-
+app.use(cors());
 app.use(bodyParser.json());
 app.use(updateLastSeen);
 app.use(checkAuth);
+
+app.use('/auth', authRoutes);
+app.use('/user', userRoutes);
+app.use('/dialogs', dialogsRoutes);
+app.use('/messages', messagesRoutes);
 
 mongoose.connect('mongodb://localhost:27017/chat', {
   useNewUrlParser: true,
@@ -27,19 +35,10 @@ mongoose.connect('mongodb://localhost:27017/chat', {
   useFindAndModify: false,
 });
 
-app.get('/user/:id', UserController.find);
-app.delete('/user/:id', UserController.delete);
-app.post('/user/register', registerValidation, UserController.create);
-app.post('/user/login', loginValidation, UserController.login);
+io.on('connection', (socket: socket.Socket) => {
+  //TODO: Socket connection;
+});
 
-app.get('/dialogs', DialogController.find);
-app.delete('/dialogs/:id', DialogController.delete);
-app.post('/dialogs', DialogController.create);
-
-app.get('/messages', MessageController.index);
-app.post('/messages', MessageController.create);
-app.delete('/messages/:id', MessageController.delete);
-
-app.listen(process.env.PORT, () => {
+http.listen(process.env.PORT, () => {
   console.log(`Server: http://localhost:${process.env.PORT}`);
 });

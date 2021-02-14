@@ -1,8 +1,11 @@
 import express from 'express';
+import { io } from '../index';
 import Message from '../models/Message';
 
 class MessageController {
-  static async index(req: express.Request, res: express.Response) {
+  private static socket = io;
+
+  public static async index(req: express.Request, res: express.Response): Promise<void> {
     try {
       const dialogId: string = <string>req.query.dialog;
       const messages = await Message.find({ dialog: dialogId }).populate('dialog');
@@ -12,19 +15,21 @@ class MessageController {
     }
   }
 
-  static async create(req: express.Request, res: express.Response) {
+  public static async create(req: express.Request, res: express.Response): Promise<void> {
     try {
-      const userId: string = '601eed00cb2f956b258c4caa';
+      const userId: string = req.user._id;
       const { text, dialogId } = req.body;
       const message = new Message({ text, dialog: dialogId, user: userId });
-      const result = await message.save();
-      res.json(result);
+      let messageResult = await message.save();
+      messageResult = await messageResult.populate('dialog user').execPopulate();
+      res.json(messageResult);
+      MessageController.socket.emit('SERVER:NEW_MESSAGE', messageResult);
     } catch (error) {
       console.log(error);
     }
   }
 
-  static async delete(req: express.Request, res: express.Response) {
+  public static async delete(req: express.Request, res: express.Response): Promise<void> {
     try {
       const id: string = req.params.id;
       const dialog = await Message.findByIdAndDelete(id);

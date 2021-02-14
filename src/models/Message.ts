@@ -1,9 +1,8 @@
 import mongoose, { Schema, Document } from 'mongoose';
-import { IDialog } from './Dialog';
 
 export interface IMessage extends Document {
   text: string;
-  dialog: IDialog | string;
+  dialog: string;
   read: boolean;
 }
 

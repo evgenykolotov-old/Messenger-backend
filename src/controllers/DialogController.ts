@@ -1,33 +1,50 @@
 import express from 'express';
+import { io } from '../index';
 import Dialog from '../models/Dialog';
 import Message from '../models/Message';
 
 class DialogController {
-  static async find(req: express.Request, res: express.Response) {
+  private static socket: any = io;
+
+  public static async find(req: express.Request, res: express.Response): Promise<void> {
     try {
-      const authorId: string = req.params.id;
-      const dialogs = await Dialog.find({ author: authorId }).populate(['author', 'partner']);
+      const authorId: string = req.user._id;
+      const dialogs = await Dialog.find({ author: authorId }).populate([
+        'author',
+        'partner',
+      ]);
       res.json(dialogs);
     } catch (error) {
       console.log(error);
     }
   }
 
-  static async create(req: express.Request, res: express.Response) {
+  public static async create(req: express.Request, res: express.Response): Promise<void> {
     try {
       const { author, partner, text } = req.body;
-      const dialog = new Dialog({ author, partner });
-      const message = new Message({ text, dialog: dialog._id, user: author });
-      dialog.lastMessage = message._id;
-      const result = await dialog.save();
-      await message.save();
-      res.json(result);
+      const candidate = await Dialog.findOne({ author, partner });
+      if (candidate) {
+        res.status(403).json({
+          status: 'error',
+          message: 'Такой диалог уже есть',
+        });
+      } else {
+        const dialog = new Dialog({ author, partner });
+        const message = new Message({ text, dialog: dialog._id, user: author });
+        const { _id } = await message.save();
+        dialog.lastMessage = _id;
+        const dialogResult = await dialog.save();
+        res.json(dialogResult);
+      }
     } catch (error) {
-      console.log(error);
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
     }
   }
 
-  static async delete(req: express.Request, res: express.Response) {
+  public static async delete(req: express.Request, res: express.Response): Promise<void> {
     try {
       const id: string = req.params.id;
       const dialog = await Dialog.findByIdAndDelete(id);

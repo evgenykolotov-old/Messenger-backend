@@ -9,7 +9,10 @@ export interface DecodedData {
 
 const verifyJWToken = (token: string): Promise<DecodedData> => {
   return new Promise(
-    (resolve: (decodedData: DecodedData) => void, reject: (err: jwt.JsonWebTokenError) => void) => {
+    (
+      resolve: (decodedData: DecodedData) => void,
+      reject: (err: jwt.JsonWebTokenError) => void
+    ) => {
       jwt.verify(token, <string>process.env.JWT_SECRET, (err, decodedData) => {
         if (err || !decodedData) {
           return reject(<jwt.JsonWebTokenError>err);
