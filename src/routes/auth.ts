@@ -5,6 +5,7 @@ import registerValidation from '../utils/validations/register';
 
 const router = Router();
 
+router.get('/verify', AuthController.verify);
 router.post('/signup', registerValidation, AuthController.signUp);
 router.post('/signin', loginValidation, AuthController.signIn);
 

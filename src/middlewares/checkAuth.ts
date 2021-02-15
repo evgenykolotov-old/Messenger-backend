@@ -10,7 +10,7 @@ const checkAuth = (
   if (
     req.path === '/auth/signin' ||
     req.path === '/auth/signup' ||
-    req.path === '/user/verify'
+    req.path === '/auth/verify'
   ) {
     return next();
   }
