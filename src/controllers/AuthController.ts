@@ -53,7 +53,7 @@ class AuthController {
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: 'Ошибка на сервере',
+        message: error,
       });
     }
   }
@@ -85,7 +85,7 @@ class AuthController {
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: 'Ошибка на сервере',
+        message: error,
       });
     }
   }

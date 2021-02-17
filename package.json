@@ -15,6 +15,7 @@
   "license": "ISC",
   "dependencies": {
     "@types/bcrypt": "^3.0.0",
+    "@types/date-fns": "^2.6.0",
     "@types/jsonwebtoken": "^8.5.0",
     "@types/lodash": "^4.14.168",
     "@types/passport": "^1.0.6",
@@ -23,6 +24,7 @@
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
+    "date-fns": "^2.17.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "express-validator": "^6.9.2",

@@ -5,17 +5,23 @@ import User from '../models/User';
 class UserController {
   private static socket: any = io;
 
-  public static async index(req: express.Request, res: express.Response): Promise<void> {
+  public static async find(req: express.Request, res: express.Response): Promise<void> {
     try {
       const id: string = req.params.id;
       const user = await User.findById(id);
       if (user) {
         res.json(user);
       } else {
-        res.status(404).json({ message: 'User Not Fround' });
+        res.status(404).json({
+          status: 'error',
+          message: 'User Not Fround',
+        });
       }
     } catch (error) {
-      console.log(error);
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
     }
   }
 
@@ -26,10 +32,16 @@ class UserController {
       if (user) {
         res.json(user);
       } else {
-        res.status(404).json({ message: 'User Not Fround' });
+        res.status(404).json({
+          status: 'error',
+          message: 'User Not Fround',
+        });
       }
     } catch (error) {
-      console.log(error);
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
     }
   }
 
@@ -38,12 +50,21 @@ class UserController {
       const id: string = req.params.id;
       const user = await User.findByIdAndDelete(id);
       if (user) {
-        res.json({ message: `User ${user.fullname} Deleted` });
+        res.json({
+          status: 'success',
+          message: `User ${user.fullname} Deleted`,
+        });
       } else {
-        res.json({ message: 'User Not Fround' });
+        res.status(404).json({
+          status: 'errror',
+          message: 'User Not Fround',
+        });
       }
     } catch (error) {
-      console.log(error);
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
     }
   }
 }

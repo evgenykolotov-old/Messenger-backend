@@ -1,4 +1,4 @@
-import express from 'express';
+import { Request, Response } from 'express';
 import { io } from '../index';
 import Dialog from '../models/Dialog';
 import Message from '../models/Message';
@@ -6,20 +6,33 @@ import Message from '../models/Message';
 class DialogController {
   private static socket: any = io;
 
-  public static async find(req: express.Request, res: express.Response): Promise<void> {
+  public static async findAll(req: Request, res: Response): Promise<void> {
     try {
-      const authorId: string = req.user._id;
-      const dialogs = await Dialog.find({ author: authorId }).populate([
-        'author',
-        'partner',
-      ]);
-      res.json(dialogs);
+      const userId: string = req.user._id;
+      const dialogs = await Dialog.find()
+        .or([{ author: userId }, { partner: userId }])
+        .populate(['author', 'partner'])
+        .populate({
+          path: 'lastMessage',
+          populate: { path: 'user' },
+        });
+      if (dialogs) {
+        res.json(dialogs);
+      } else {
+        res.status(404).json({
+          status: 'error',
+          message: 'Список диалогов пуст',
+        });
+      }
     } catch (error) {
-      console.log(error);
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
     }
   }
 
-  public static async create(req: express.Request, res: express.Response): Promise<void> {
+  public static async create(req: Request, res: Response): Promise<void> {
     try {
       const { author, partner, text } = req.body;
       const candidate = await Dialog.findOne({ author, partner });
@@ -44,7 +57,7 @@ class DialogController {
     }
   }
 
-  public static async delete(req: express.Request, res: express.Response): Promise<void> {
+  public static async delete(req: Request, res: Response): Promise<void> {
     try {
       const id: string = req.params.id;
       const dialog = await Dialog.findByIdAndDelete(id);
@@ -54,7 +67,10 @@ class DialogController {
         res.json({ message: 'Dialog Not Fround' });
       }
     } catch (error) {
-      console.log(error);
+      res.status(500).json({
+        status: 'error',
+        message: error,
+      });
     }
   }
 }

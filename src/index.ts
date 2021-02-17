@@ -20,8 +20,8 @@ import checkAuth from './middlewares/checkAuth';
 
 app.use(cors());
 app.use(bodyParser.json());
-app.use(updateLastSeen);
 app.use(checkAuth);
+app.use(updateLastSeen);
 
 app.use('/auth', authRoutes);
 app.use('/user', userRoutes);
