@@ -34,7 +34,8 @@ class DialogController {
 
   public static async create(req: Request, res: Response): Promise<void> {
     try {
-      const { author, partner, text } = req.body;
+      const author = req.user._id;
+      const { partner, text } = req.body;
       const candidate = await Dialog.findOne({ author, partner });
       if (candidate) {
         res.status(403).json({
@@ -48,6 +49,11 @@ class DialogController {
         dialog.lastMessage = _id;
         const dialogResult = await dialog.save();
         res.json(dialogResult);
+        DialogController.socket.emit('SERVER:DIALOG_CREATED', {
+          author,
+          partner,
+          dialog: dialogResult,
+        });
       }
     } catch (error) {
       res.status(500).json({

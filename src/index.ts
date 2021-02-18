@@ -7,7 +7,9 @@ import cors from 'cors';
 
 const app = express();
 const http = require('http').Server(app);
-export const io = require('socket.io')(http);
+export const io = require('socket.io')(http, {
+  cors: { origin: 'http://localhost:3000' },
+});
 dotenv.config();
 
 import authRoutes from './routes/auth';

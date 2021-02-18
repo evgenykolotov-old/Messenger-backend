@@ -9,7 +9,7 @@ class MessageController {
   public static async findAll(req: Request, res: Response): Promise<void> {
     try {
       const dialogId: string = <string>req.query.dialog;
-      const messages = await Message.find({ dialog: dialogId }).populate('dialog');
+      const messages = await Message.find({ dialog: dialogId }).populate('dialog user');
       res.json(messages);
     } catch (error) {
       res.status(500).json({
