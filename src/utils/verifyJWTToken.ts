@@ -1,9 +1,9 @@
 import jwt from 'jsonwebtoken';
-import { IUser } from '../models/User';
+import { User } from '../models/User';
 
 export interface DecodedData {
   data: {
-    _doc: IUser;
+    _doc: User;
   };
 }
 

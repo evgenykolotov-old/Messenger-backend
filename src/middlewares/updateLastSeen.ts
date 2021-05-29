@@ -1,11 +1,7 @@
-import express from 'express';
+import { Request, Response, NextFunction } from 'express';
 import User from '../models/User';
 
-const updateLastSeen = async (
-  req: express.Request,
-  _: express.Response,
-  next: express.NextFunction
-): Promise<void> => {
+const updateLastSeen = async (req: Request, _: Response, next: NextFunction): Promise<void> => {
   if (req.user) {
     await User.findOneAndUpdate(
       { _id: req.user._id },
