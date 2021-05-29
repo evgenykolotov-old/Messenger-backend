@@ -1,6 +1,6 @@
 import mongoose, { Schema, Document } from 'mongoose';
 
-export interface IMessage extends Document {
+export interface Message extends Document {
   text: string;
   dialog: string;
   read: boolean;
@@ -18,6 +18,6 @@ const messageSchema: Schema = new Schema(
   }
 );
 
-const MessageModel = mongoose.model<IMessage>('Message', messageSchema);
+const MessageModel = mongoose.model<Message>('Message', messageSchema);
 
 export default MessageModel;
