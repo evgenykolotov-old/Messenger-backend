@@ -1,12 +1,8 @@
-import express from 'express';
+import { Request, Response, NextFunction } from 'express';
 import verifyJWTToken from '../utils/verifyJWTToken';
 import { DecodedData } from '../utils/verifyJWTToken';
 
-const checkAuth = (
-  req: express.Request,
-  res: express.Response,
-  next: express.NextFunction
-): void => {
+const checkAuth = ( req: Request, res: Response, next: NextFunction ): void => {
   if (
     req.path === '/auth/signin' ||
     req.path === '/auth/signup' ||
@@ -25,7 +21,7 @@ const checkAuth = (
         next();
       })
       .catch(() => {
-        res.status(403).json({ message: 'Invalid auth token provided.' });
+        res.status(401).json({ status: 'error', result: 'Пользователь не авторизован!' });
       });
   }
 };

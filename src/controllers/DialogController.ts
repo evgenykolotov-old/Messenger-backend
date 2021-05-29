@@ -8,7 +8,7 @@ class DialogController {
 
   public static async findAll(req: Request, res: Response): Promise<void> {
     try {
-      const userId: string = req.user._id;
+      const userId = req.user?._id;
       const dialogs = await Dialog.find()
         .or([{ author: userId }, { partner: userId }])
         .populate(['author', 'partner'])
@@ -17,30 +17,30 @@ class DialogController {
           populate: { path: 'user' },
         });
       if (dialogs) {
-        res.json(dialogs);
+        res.status(200).json({ status: 'success', result: dialogs });
       } else {
         res.status(404).json({
           status: 'error',
-          message: 'Список диалогов пуст',
+          result: 'Список диалогов пуст',
         });
       }
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: error,
+        result: `Возникла ошибка на сервере: "${error}". Попробуйте позже`,
       });
     }
   }
 
   public static async create(req: Request, res: Response): Promise<void> {
     try {
-      const author = req.user._id;
+      const author = req.user?._id;
       const { partner, text } = req.body;
       const candidate = await Dialog.findOne({ author, partner });
       if (candidate) {
         res.status(403).json({
           status: 'error',
-          message: 'Такой диалог уже есть',
+          result: 'Такой диалог уже существует',
         });
       } else {
         const dialog = new Dialog({ author, partner });
@@ -48,7 +48,7 @@ class DialogController {
         const { _id } = await message.save();
         dialog.lastMessage = _id;
         const dialogResult = await dialog.save();
-        res.json(dialogResult);
+        res.status(200).json({ status: 'success', result: dialogResult });
         DialogController.socket.emit('SERVER:DIALOG_CREATED', {
           author,
           partner,
@@ -58,7 +58,7 @@ class DialogController {
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: error,
+        result: `Возникла ошибка на сервере: "${error}". Попробуйте позже`,
       });
     }
   }
@@ -68,14 +68,14 @@ class DialogController {
       const id: string = req.params.id;
       const dialog = await Dialog.findByIdAndDelete(id);
       if (dialog) {
-        res.json({ message: `Dialog Deleted` });
+        res.status(200).json({ status: 'success', result: 'Диалог был удалён' });
       } else {
-        res.json({ message: 'Dialog Not Fround' });
+        res.status(404).json({ status: 'error', result: 'Диалог не найдён' });
       }
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: error,
+        result: `Возникла ошибка на сервере: "${error}". Попробуйте позже`,
       });
     }
   }

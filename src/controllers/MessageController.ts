@@ -1,6 +1,6 @@
 import { Request, Response } from 'express';
 import { io } from '../index';
-import Message, { IMessage } from '../models/Message';
+import Message from '../models/Message';
 import Dialog from '../models/Dialog';
 
 class MessageController {
@@ -10,20 +10,20 @@ class MessageController {
     try {
       const dialogId: string = <string>req.query.dialog;
       const messages = await Message.find({ dialog: dialogId }).populate('dialog user');
-      res.json(messages);
+      res.status(200).json({ status: 'success', result: messages });
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: error,
+        result: `Возникла ошибка на сервере: "${error}". Попробуйте позже`,
       });
     }
   }
 
   public static async create(req: Request, res: Response): Promise<void> {
     try {
-      const userId: string = req.user._id;
+      const userId = req.user?._id;
       const { text, dialogId } = req.body;
-      const message: IMessage = new Message({ text, dialog: dialogId, user: userId });
+      const message = new Message({ text, dialog: dialogId, user: userId });
       let messageResult = await message.save();
       messageResult = await messageResult.populate('dialog user').execPopulate();
       await Dialog.findOneAndUpdate(
@@ -31,12 +31,12 @@ class MessageController {
         { lastMessage: message._id },
         { upsert: true }
       );
-      res.json(messageResult);
+      res.status(201).json({ status: 'success', result: messageResult });
       MessageController.socket.emit('SERVER:NEW_MESSAGE', messageResult);
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: error,
+        result: `Возникла ошибка на сервере: "${error}". Попробуйте позже`,
       });
     }
   }
@@ -46,20 +46,20 @@ class MessageController {
       const id: string = req.params.id;
       const dialog = await Message.findByIdAndDelete(id);
       if (dialog) {
-        res.json({
+        res.status(200).json({
           status: 'success',
-          message: 'Message Deleted',
+          result: 'Сообщение удалено',
         });
       } else {
-        res.status(403).json({
+        res.status(404).json({
           status: 'error',
-          message: 'Message Not Fround',
+          result: 'Ошибка! Сообщение не найдено',
         });
       }
     } catch (error) {
       res.status(500).json({
         status: 'error',
-        message: error,
+        result: `Возникла ошибка на сервере: "${error}". Попробуйте позже`,
       });
     }
   }

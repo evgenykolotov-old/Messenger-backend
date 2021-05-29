@@ -1,12 +1,12 @@
 import jwt from 'jsonwebtoken';
 import { reduce } from 'lodash';
 
-interface ILoginData {
+interface LoginData {
   email: string;
   password: string;
 }
 
-const createJWToken = (user: ILoginData): string => {
+const createJWToken = (user: LoginData): string => {
   const token = jwt.sign(
     {
       data: reduce(
