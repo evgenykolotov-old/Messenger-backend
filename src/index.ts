@@ -1,7 +1,6 @@
 import express from 'express';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
-import bodyParser from 'body-parser';
 import socket from 'socket.io';
 import cors from 'cors';
 
@@ -21,7 +20,7 @@ import updateLastSeen from './middlewares/updateLastSeen';
 import checkAuth from './middlewares/checkAuth';
 
 app.use(cors());
-app.use(bodyParser.json());
+app.use(express.json());
 app.use(checkAuth);
 app.use(updateLastSeen);
 
