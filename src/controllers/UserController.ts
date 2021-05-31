@@ -67,6 +67,32 @@ class UserController {
       });
     }
   }
+
+  public static async findUsers(req: Request, res: Response): Promise<void> {
+  	try {
+  	  const query = req.query.query;
+  	  const users = await User.find().or(
+  	    { fullname: new RegExp(query, "i")}, 
+  	    { email: new RegExp(query, "i") }
+  	  );
+  	  if (users) {
+  	  	res.status(200).json({
+  	  	  status: 'success',
+  	  	  result: users,
+  	  	})
+  	  } else {
+        res.status(404).json({
+          status: 'error',
+          result: 'Пользователи не найдены',
+        });  	  	
+  	  }
+  	} catch (error) {
+  	  res.status(500).json({
+        status: 'error',
+        result: `Возникла ошибка на сервере: "${error}". Попробуйте позже`,
+      });	
+  	}
+  }
 }
 
 export default UserController;
