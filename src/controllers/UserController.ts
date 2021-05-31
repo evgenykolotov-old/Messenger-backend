@@ -71,10 +71,10 @@ class UserController {
   public static async findUsers(req: Request, res: Response): Promise<void> {
   	try {
   	  const query = req.query.query;
-  	  const users = await User.find().or(
+  	  const users = await User.find().or([
   	    { fullname: new RegExp(query, "i")}, 
   	    { email: new RegExp(query, "i") }
-  	  );
+  	  ]);
   	  if (users) {
   	  	res.status(200).json({
   	  	  status: 'success',
