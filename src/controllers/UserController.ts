@@ -72,8 +72,8 @@ class UserController {
   	try {
   	  const query = req.query.query;
   	  const users = await User.find().or([
-  	    { fullname: new RegExp(query, "i")}, 
-  	    { email: new RegExp(query, "i") }
+  	    { fullname: new RegExp(String(query), "i")}, 
+  	    { email: new RegExp(String(query), "i") }
   	  ]);
   	  if (users) {
   	  	res.status(200).json({
